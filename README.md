@@ -1,4 +1,5 @@
 Modified Protobuf 3.5.1
+===================================================
 
 Supports via CMake to select which targets to compile via variables
   protobuf_BUILD_LIBPROTOBUF
@@ -11,6 +12,7 @@ Setting any of these on will build that specific library.
 
 It should support compiling for vxworks 6.9.
 Requires the compiler define "VXWORKS_RTP" to be defined, and it only works for the lite library.
+
 ===================================================
 
 
@@ -71,7 +73,7 @@ language, you can find instructions in the corresponding source directory about
 how to install protobuf runtime for that specific language:
 
 | Language                             | Source                                                      |
-|--------------------------------------|-------------------------------------------------------------|
+| ------------------------------------ | ----------------------------------------------------------- |
 | C++ (include C++ runtime and protoc) | [src](src)                                                  |
 | Java                                 | [java](java)                                                |
 | Python                               | [python](python)                                            |
