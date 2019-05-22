@@ -2,6 +2,8 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/any.cc
   ${protobuf_source_dir}/src/google/protobuf/any.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/api.pb.cc
+  ${protobuf_source_dir}/src/google/protobuf/arena.cc
+  ${protobuf_source_dir}/src/google/protobuf/arenastring.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/importer.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/parser.cc
   ${protobuf_source_dir}/src/google/protobuf/descriptor.cc
@@ -10,23 +12,45 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/duration.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/dynamic_message.cc
   ${protobuf_source_dir}/src/google/protobuf/empty.pb.cc
+  ${protobuf_source_dir}/src/google/protobuf/extension_set.cc
   ${protobuf_source_dir}/src/google/protobuf/extension_set_heavy.cc
   ${protobuf_source_dir}/src/google/protobuf/field_mask.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_reflection.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_table_driven.cc
+  ${protobuf_source_dir}/src/google/protobuf/generated_message_table_driven_lite.cc
+  ${protobuf_source_dir}/src/google/protobuf/generated_message_util.cc
+  ${protobuf_source_dir}/src/google/protobuf/io/coded_stream.cc
   ${protobuf_source_dir}/src/google/protobuf/io/gzip_stream.cc
   ${protobuf_source_dir}/src/google/protobuf/io/printer.cc
   ${protobuf_source_dir}/src/google/protobuf/io/strtod.cc
   ${protobuf_source_dir}/src/google/protobuf/io/tokenizer.cc
+  ${protobuf_source_dir}/src/google/protobuf/io/zero_copy_stream.cc
   ${protobuf_source_dir}/src/google/protobuf/io/zero_copy_stream_impl.cc
+  ${protobuf_source_dir}/src/google/protobuf/io/zero_copy_stream_impl_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/map_field.cc
   ${protobuf_source_dir}/src/google/protobuf/message.cc
+  ${protobuf_source_dir}/src/google/protobuf/message_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/reflection_ops.cc
+  ${protobuf_source_dir}/src/google/protobuf/repeated_field.cc
   ${protobuf_source_dir}/src/google/protobuf/service.cc
   ${protobuf_source_dir}/src/google/protobuf/source_context.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/struct.pb.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/atomicops_internals_x86_gcc.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/bytestream.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/common.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/int128.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/io_win32.cc
   ${protobuf_source_dir}/src/google/protobuf/stubs/mathlimits.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/once.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/status.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/statusor.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/stringpiece.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/stringprintf.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/structurally_valid.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/strutil.cc
   ${protobuf_source_dir}/src/google/protobuf/stubs/substitute.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/time.cc
   ${protobuf_source_dir}/src/google/protobuf/text_format.cc
   ${protobuf_source_dir}/src/google/protobuf/timestamp.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/type.pb.cc
@@ -53,6 +77,7 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/util/time_util.cc
   ${protobuf_source_dir}/src/google/protobuf/util/type_resolver_util.cc
   ${protobuf_source_dir}/src/google/protobuf/wire_format.cc
+  ${protobuf_source_dir}/src/google/protobuf/wire_format_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/wrappers.pb.cc
 )
 
@@ -113,7 +138,7 @@ set(libprotobuf_includes
 )
 
 add_library(libprotobuf ${protobuf_SHARED_OR_STATIC}
-  ${libprotobuf_lite_files} ${libprotobuf_files} ${libprotobuf_includes})
+  ${libprotobuf_files} ${libprotobuf_includes})
 target_link_libraries(libprotobuf ${CMAKE_THREAD_LIBS_INIT})
 if(protobuf_WITH_ZLIB)
     target_link_libraries(libprotobuf ${ZLIB_LIBRARIES})
@@ -127,3 +152,29 @@ endif()
 set_target_properties(libprotobuf PROPERTIES
     OUTPUT_NAME ${LIB_PREFIX}protobuf
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
+
+
+#####################################################
+# INSTALL
+set(_library libprotobuf)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protobuf.pc.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/protobuf.pc @ONLY
+)
+
+set_property(TARGET ${_library}
+  PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+  $<BUILD_INTERFACE:${protobuf_source_dir}/src>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+install(TARGETS ${_library} EXPORT protobuf-targets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${_library}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/protobuf.pc DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+export(TARGETS ${_library}
+  NAMESPACE protobuf::
+  APPEND FILE ${CMAKE_INSTALL_CMAKEDIR}/protobuf-targets.cmake
+)

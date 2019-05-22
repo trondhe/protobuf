@@ -52,6 +52,15 @@ enum { IS_COMPILER_MSVC = 1 };
 enum { IS_COMPILER_MSVC = 0 };
 #endif
 
+// Adaption for vxworks
+#ifdef VXWORKS_RTP
+#ifndef va_copy
+// Define va_copy for MSVC. This is a hack, assuming va_list is simply a
+// pointer into the stack and is safe to copy.
+#define va_copy(dest, src) ((dest) = (src))
+#endif
+#endif
+
 void StringAppendV(string* dst, const char* format, va_list ap) {
   // First try with a small fixed size buffer
   static const int kSpaceLength = 1024;

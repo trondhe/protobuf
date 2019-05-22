@@ -37,7 +37,8 @@
 
 #include <string.h>
 #include <google/protobuf/stubs/common.h>
-
+// Adaption for vxworks
+#if !defined(VXWORKS_RTP)
 #define GOOGLE_PROTOBUF_HAVE_HASH_MAP 1
 #define GOOGLE_PROTOBUF_HAVE_HASH_SET 1
 
@@ -170,6 +171,17 @@
 #include <map>
 #include <set>
 #endif
+#endif // !VXWORKS_RTP
+
+// Adaption for vxworks
+#define GOOGLE_PROTOBUF_MISSING_HASH
+#include <map>
+#include <set>
+# define GOOGLE_PROTOBUF_HASH_NAMESPACE_DECLARATION_START \
+  namespace google {                                      \
+  namespace protobuf {
+# define GOOGLE_PROTOBUF_HASH_NAMESPACE_DECLARATION_END }}
+
 
 namespace google {
 namespace protobuf {

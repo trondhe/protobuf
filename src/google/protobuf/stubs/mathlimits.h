@@ -251,6 +251,11 @@ DECL_UNSIGNED_INT_LIMITS(unsigned long long int)
   static bool IsPosInf(const Type x) { return _fpclass(x) == _FPCLASS_PINF; } \
   static bool IsNegInf(const Type x) { return _fpclass(x) == _FPCLASS_NINF; }
 #else
+// Adaption for vxworks
+  #ifdef VXWORKS_RTP
+    int isnan(double x){ return x !=x;}
+    int isinf(double x){return x==(1.0/0.0) || x==(-1.0/0.0);}
+  #endif
 #define DECL_FP_LIMIT_FUNCS \
   static bool IsFinite(const Type x) { return !ISINF(x) && !ISNAN(x); } \
   static bool IsNaN(const Type x) { return ISNAN(x); } \

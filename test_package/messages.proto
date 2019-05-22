@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message Movement {
+	double xPos = 1;
+	double yPos = 2;
+	double zPos = 3;
+}

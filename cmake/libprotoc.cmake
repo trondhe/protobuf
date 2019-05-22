@@ -227,3 +227,23 @@ set_target_properties(libprotoc PROPERTIES
     COMPILE_DEFINITIONS LIBPROTOC_EXPORTS
     OUTPUT_NAME ${LIB_PREFIX}protoc
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
+
+
+#####################################################
+# INSTALL
+set(_library libprotoc)
+include(GNUInstallDirs)
+
+set_property(TARGET ${_library}
+  PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+  $<BUILD_INTERFACE:${protobuf_source_dir}/src>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+install(TARGETS ${_library} EXPORT protobuf-targets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${_library}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library})
+
+export(TARGETS ${_library}
+  NAMESPACE protobuf::
+  APPEND FILE ${CMAKE_INSTALL_CMAKEDIR}/protobuf-targets.cmake
+)

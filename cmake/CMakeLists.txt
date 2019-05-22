@@ -1,6 +1,3 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 2.8.12)
-
 if(protobuf_VERBOSE)
   message(STATUS "Protocol Buffers Configuring...")
 endif()
@@ -9,25 +6,25 @@ endif()
 cmake_policy(SET CMP0022 NEW)
 
 # Project
-project(protobuf C CXX)
+project(protobuf CXX)
 
 # Options
 option(protobuf_BUILD_TESTS "Build tests" ON)
 option(protobuf_BUILD_EXAMPLES "Build examples" OFF)
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
   set(protobuf_BUILD_SHARED_LIBS_DEFAULT ON)
-else (BUILD_SHARED_LIBS)
+else(BUILD_SHARED_LIBS)
   set(protobuf_BUILD_SHARED_LIBS_DEFAULT OFF)
-endif (BUILD_SHARED_LIBS)
+endif(BUILD_SHARED_LIBS)
 option(protobuf_BUILD_SHARED_LIBS "Build Shared Libraries" ${protobuf_BUILD_SHARED_LIBS_DEFAULT})
 include(CMakeDependentOption)
 cmake_dependent_option(protobuf_MSVC_STATIC_RUNTIME "Link static runtime libraries" ON
   "NOT protobuf_BUILD_SHARED_LIBS" OFF)
-if (MSVC)
+if(MSVC)
   set(protobuf_WITH_ZLIB_DEFAULT OFF)
-else (MSVC)
+else(MSVC)
   set(protobuf_WITH_ZLIB_DEFAULT ON)
-endif (MSVC)
+endif(MSVC)
 option(protobuf_WITH_ZLIB "Build with zlib support" ${protobuf_WITH_ZLIB_DEFAULT})
 set(protobuf_DEBUG_POSTFIX "d"
   CACHE STRING "Default debug postfix")
@@ -82,46 +79,47 @@ endif()
 add_definitions(-DGOOGLE_PROTOBUF_CMAKE_BUILD)
 
 find_package(Threads REQUIRED)
-if (CMAKE_USE_PTHREADS_INIT)
+if(CMAKE_USE_PTHREADS_INIT)
   add_definitions(-DHAVE_PTHREAD)
-endif (CMAKE_USE_PTHREADS_INIT)
+endif(CMAKE_USE_PTHREADS_INIT)
 
 set(_protobuf_FIND_ZLIB)
-if (protobuf_WITH_ZLIB)
+if(protobuf_WITH_ZLIB)
   find_package(ZLIB)
-  if (ZLIB_FOUND)
+  if(ZLIB_FOUND)
     set(HAVE_ZLIB 1)
     # FindZLIB module define ZLIB_INCLUDE_DIRS variable
     # Set ZLIB_INCLUDE_DIRECTORIES for compatible
     set(ZLIB_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIRECTORIES} ${ZLIB_INCLUDE_DIRS})
     # Using imported target if exists
-    if (TARGET ZLIB::ZLIB)
+    if(TARGET ZLIB::ZLIB)
       set(ZLIB_LIBRARIES ZLIB::ZLIB)
       set(_protobuf_FIND_ZLIB "if(NOT ZLIB_FOUND)\n  find_package(ZLIB)\nendif()")
-    endif (TARGET ZLIB::ZLIB)
-  else (ZLIB_FOUND)
+    endif(TARGET ZLIB::ZLIB)
+  else(ZLIB_FOUND)
     set(HAVE_ZLIB 0)
     # Explicitly set these to empty (override NOT_FOUND) so cmake doesn't
     # complain when we use them later.
     set(ZLIB_INCLUDE_DIRECTORIES)
     set(ZLIB_LIBRARIES)
-  endif (ZLIB_FOUND)
-endif (protobuf_WITH_ZLIB)
+  endif(ZLIB_FOUND)
+endif(protobuf_WITH_ZLIB)
 
-if (HAVE_ZLIB)
+if(HAVE_ZLIB)
   add_definitions(-DHAVE_ZLIB)
-endif (HAVE_ZLIB)
+endif(HAVE_ZLIB)
 
-if (protobuf_BUILD_SHARED_LIBS)
+if(protobuf_BUILD_SHARED_LIBS)
   set(protobuf_SHARED_OR_STATIC "SHARED")
-else (protobuf_BUILD_SHARED_LIBS)
+else(protobuf_BUILD_SHARED_LIBS)
   set(protobuf_SHARED_OR_STATIC "STATIC")
   # In case we are building static libraries, link also the runtime library statically
   # so that MSVCR*.DLL is not required at runtime.
   # https://msdn.microsoft.com/en-us/library/2kzt1wy3.aspx
   # This is achieved by replacing msvc option /MD with /MT and /MDd with /MTd
   # http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_build_my_MSVC_application_with_a_static_runtime.3F
-  if (MSVC AND protobuf_MSVC_STATIC_RUNTIME)
+  message("-----> protobuf_MSVC_STATIC_RUNTIME: ${protobuf_MSVC_STATIC_RUNTIME}")
+  if(MSVC AND protobuf_MSVC_STATIC_RUNTIME)
     foreach(flag_var
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
         CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
@@ -129,10 +127,10 @@ else (protobuf_BUILD_SHARED_LIBS)
         string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
       endif(${flag_var} MATCHES "/MD")
     endforeach(flag_var)
-  endif (MSVC AND protobuf_MSVC_STATIC_RUNTIME)
-endif (protobuf_BUILD_SHARED_LIBS)
+  endif(MSVC AND protobuf_MSVC_STATIC_RUNTIME)
+endif(protobuf_BUILD_SHARED_LIBS)
 
-if (MSVC)
+if(MSVC)
   # Build with multiple processes
   add_definitions(/MP)
   # MSVC warning suppressions
@@ -160,7 +158,7 @@ if (MSVC)
   
   # Suppress linker warnings about files with no symbols defined.
   set(CMAKE_STATIC_LINKER_FLAGS /ignore:4221)
-endif (MSVC)
+endif(MSVC)
 
 get_filename_component(protobuf_source_dir ${protobuf_SOURCE_DIR} PATH)
 
@@ -169,33 +167,41 @@ include_directories(
   ${protobuf_BINARY_DIR}
   ${protobuf_source_dir}/src)
 
-if (MSVC)
+if(MSVC)
   # Add the "lib" prefix for generated .lib outputs.
   set(LIB_PREFIX lib)
-else (MSVC)
+else()
   # When building with "make", "lib" prefix will be added automatically by
   # the build tool.
   set(LIB_PREFIX)
-endif (MSVC)
+endif()
 
-if (protobuf_UNICODE)
+if(protobuf_UNICODE)
   add_definitions(-DUNICODE -D_UNICODE)
-endif (protobuf_UNICODE)
+endif(protobuf_UNICODE)
 
-include(libprotobuf-lite.cmake)
-include(libprotobuf.cmake)
-include(libprotoc.cmake)
-include(protoc.cmake)
+include(GNUInstallDirs)
 
-if (protobuf_BUILD_TESTS)
-  include(tests.cmake)
-endif (protobuf_BUILD_TESTS)
+if(_BUILD_LIBPROTOBUF_LITE)
+  include(libprotobuf-lite.cmake)
+endif()
+if(_BUILD_LIBPROTOBUF)
+  include(libprotobuf.cmake)
+endif()
+if(_BUILD_PROTOC)
+  include(libprotoc.cmake)
+  include(protoc.cmake)
+endif()
 
 include(install.cmake)
 
-if (protobuf_BUILD_EXAMPLES)
+if(protobuf_BUILD_TESTS AND _BUILD_ALL)
+  include(tests.cmake)
+endif()
+
+if(protobuf_BUILD_EXAMPLES AND _BUILD_ALL)
   include(examples.cmake)
-endif (protobuf_BUILD_EXAMPLES)
+endif()
 
 if(protobuf_VERBOSE)
     message(STATUS "Protocol Buffers Configuring done")

@@ -1,29 +1,3 @@
-include(GNUInstallDirs)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protobuf.pc.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/protobuf.pc @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protobuf-lite.pc.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/protobuf-lite.pc @ONLY)
-
-foreach(_library
-  libprotobuf-lite
-  libprotobuf
-  libprotoc)
-  set_property(TARGET ${_library}
-    PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-    $<BUILD_INTERFACE:${protobuf_source_dir}/src>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-  install(TARGETS ${_library} EXPORT protobuf-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${_library}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library})
-endforeach()
-
-install(TARGETS protoc EXPORT protobuf-targets
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT protoc)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/protobuf.pc ${CMAKE_CURRENT_BINARY_DIR}/protobuf-lite.pc DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-
 file(STRINGS extract_includes.bat.in _extract_strings
   REGEX "^copy")
 foreach(_extract_string ${_extract_strings})
@@ -100,11 +74,6 @@ configure_file(protobuf-module.cmake.in
 configure_file(protobuf-options.cmake
   ${CMAKE_INSTALL_CMAKEDIR}/protobuf-options.cmake @ONLY)
 
-# Allows the build directory to be used as a find directory.
-export(TARGETS libprotobuf-lite libprotobuf libprotoc protoc
-  NAMESPACE protobuf::
-  FILE ${CMAKE_INSTALL_CMAKEDIR}/protobuf-targets.cmake
-)
 
 install(EXPORT protobuf-targets
   DESTINATION "${CMAKE_INSTALL_CMAKEDIR}"

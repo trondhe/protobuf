@@ -62,3 +62,28 @@ endif()
 set_target_properties(libprotobuf-lite PROPERTIES
     OUTPUT_NAME ${LIB_PREFIX}protobuf-lite
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
+
+
+#####################################################
+# INSTALL
+set(_library libprotobuf-lite)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protobuf-lite.pc.cmake
+${CMAKE_CURRENT_BINARY_DIR}/protobuf-lite.pc @ONLY)
+
+set_property(TARGET ${_library}
+PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+$<BUILD_INTERFACE:${protobuf_source_dir}/src>
+$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+install(TARGETS ${_library} EXPORT protobuf-targets
+RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${_library}
+LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
+ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${_library}
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/protobuf-lite.pc DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+export(TARGETS ${_library}
+  NAMESPACE protobuf::
+  APPEND FILE ${CMAKE_INSTALL_CMAKEDIR}/protobuf-targets.cmake
+)

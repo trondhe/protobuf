@@ -48,6 +48,9 @@
 #define snprintf _snprintf    // see comment in strutil.cc
 #elif defined(HAVE_PTHREAD)
 #include <pthread.h>
+// Adaption for vxworks
+#elif defined (VXWORKS_RTP)
+#include <pthread.h>
 #else
 #error "No suitable threading library available."
 #endif
@@ -356,7 +359,8 @@ void Mutex::AssertHeld() {
 #endif
 }
 
-#elif defined(HAVE_PTHREAD)
+// helgete, erikmg: Adaption for VxWorks
+#elif defined(HAVE_PTHREAD) || defined(VXWORKS_RTP)
 
 struct Mutex::Internal {
   pthread_mutex_t mutex;
