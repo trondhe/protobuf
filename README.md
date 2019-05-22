@@ -1,3 +1,19 @@
+Modified Protobuf 3.5.1
+
+Supports via CMake to select which targets to compile via variables
+  protobuf_BUILD_LIBPROTOBUF
+  protobuf_BUILD_LIBPROTOBUF_LITE
+  protobuf_BUILD_PROTOC
+
+They are all default off, which will result in everything being build which is the original behaviour.
+Setting any of these on will build that specific library.
+"cmake -Dprotobuf_BUILD_LIBPROTOBUF_LITE=On .." for building the lite library.
+
+It should support compiling for vxworks 6.9.
+Requires the compiler define "VXWORKS_RTP" to be defined, and it only works for the lite library.
+===================================================
+
+
 Protocol Buffers - Google's data interchange format
 ===================================================
 
